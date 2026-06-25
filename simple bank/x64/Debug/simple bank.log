@@ -1,6 +1,0 @@
-﻿  Source.cpp
-C:\Users\DELL\source\repos\simple bank\MyLib.h(151,26): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-  (compiling source file 'Source.cpp')
-  
-C:\Users\DELL\source\repos\simple bank\Source.cpp(93,25): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-  simple bank.vcxproj -> C:\Users\DELL\source\repos\simple bank\x64\Debug\simple bank.exe
