@@ -7,8 +7,8 @@
 
 using namespace std;
 
-string fileName = "clientData.txt";
-string delim = "#//#";
+const string FILENAME = "clientData.txt";
+const string DELIM = "#//#";
 struct Client {
 	string accountNumber;
 	string pincode;
@@ -27,10 +27,10 @@ string ConvertClientToRecordString(Client client) {
 
 	string recordString = "";
 
-	recordString += client.accountNumber + delim
-		+ client.pincode + delim
-		+ client.name + delim
-		+ client.phoneNumber + delim
+	recordString += client.accountNumber + DELIM
+		+ client.pincode + DELIM
+		+ client.name + DELIM
+		+ client.phoneNumber + DELIM
 		+ to_string(client.balance);
 
 	return recordString;
@@ -109,7 +109,7 @@ Client ConvertRecordStringToClient(string text ) {
 
 	Client client;
 
-	vector<string> data = SplitString(text, delim);
+	vector<string> data = SplitString(text, DELIM);
 
 	client.accountNumber = data[0];
 	client.pincode = data[1];
@@ -125,7 +125,7 @@ Client ConvertRecordStringToClient(string text ) {
 
 
 
-void AddClients() {
+void AddClients(vector<Client> &clients) {
 
 	char answer = 'n';
 	Client client;
@@ -134,7 +134,9 @@ void AddClients() {
 		system("cls");
 
 		client = ReadClientData();
-		SaveClientToFile(client,fileName);
+		SaveClientToFile(client,FILENAME);
+
+		clients.push_back(client);
 		
 		cout << "do you want to add more clients ? [y] [n]\n";
 		cin >> answer;
@@ -160,9 +162,10 @@ vector <Client> LoadClientsFromFile(string fileName) {
 
 		while (getline(myfile, line)) {
 
-			if (line != "") 
+			if (line != "") {
 				client = ConvertRecordStringToClient(line);
-			clients.push_back(client);
+				clients.push_back(client);
+			}
 		}
 
 		myfile.close();
@@ -182,9 +185,9 @@ void PrintClient(Client client) {
 
 }
 
-void ShowAllClients() {
+void ShowAllClients(const vector<Client> & clients) {
 
-	vector<Client> clients = LoadClientsFromFile(fileName);
+	 
 
 	cout << "				list of (" << clients.size() << ") clients\n";
 	cout << "---------------------------------------------------------------------------------------\n";
@@ -220,7 +223,7 @@ void PrintClientCard(Client client) {
 
 }
 
-bool FindClientByAccountNumber(vector<Client> clients, string accountNumber,Client &client) {
+bool FindClientByAccountNumber(const vector<Client> &clients, string accountNumber,Client &client) {
 	for (Client c : clients) {
 		if (c.accountNumber == accountNumber)
 		{
@@ -233,11 +236,10 @@ bool FindClientByAccountNumber(vector<Client> clients, string accountNumber,Clie
 
 }
 
-void FindAndPrintClient() {
+void FindAndPrintClient(const vector<Client> &clients) {
 
 	string accountNumber = MyLib::ReadString("enter account number to find");
 	Client client;
-	vector<Client> clients = LoadClientsFromFile(fileName);
 	if (FindClientByAccountNumber(clients, accountNumber, client)) {
 		PrintClientCard(client);
 	}
@@ -251,10 +253,10 @@ void FindAndPrintClient() {
 
 }
 
-void DeleteClient() {
+void DeleteClient(vector<Client>& clients) {
 
 	string accountNumber = MyLib::ReadString("enter account number to delete ");
-	vector<Client> clients = LoadClientsFromFile(fileName);
+	 
 	char answer;
 	Client client;
 	if (FindClientByAccountNumber(clients, accountNumber, client)) {
@@ -268,7 +270,7 @@ void DeleteClient() {
 				{
 					c.markForDelete = true;
 					SaveUpdatedClientsToFile(clients);
-					clients = LoadClientsFromFile(fileName);
+					clients = LoadClientsFromFile(FILENAME);
 					break;
 				}
 			}
@@ -306,11 +308,11 @@ void ChangeClientData(Client& client) {
 
 }
 
-void UpdateClient() {
+void UpdateClient(vector<Client> &clients) {
 
 	string accountNumber = MyLib::ReadString("enter account number to update ");
 
-	vector<Client> clients = LoadClientsFromFile(fileName);
+	
 	Client client;
 	char answer;
 
@@ -322,8 +324,8 @@ void UpdateClient() {
 			for (Client& c : clients) {
 				if (c.accountNumber == accountNumber) {
 					ChangeClientData(c);
+					cout << "updated successfully \n";
 					SaveUpdatedClientsToFile(clients);
-					//cout << "updated successfully \n";
 					break;
 				}
 			}
@@ -348,7 +350,7 @@ void UpdateClient() {
 void SaveUpdatedClientsToFile(vector<Client> clients) {
 	fstream myfile;
 	string recordString;
-	myfile.open(fileName, ios::out);
+	myfile.open(FILENAME, ios::out);
 
 	if (myfile.is_open())
 	{
@@ -391,6 +393,7 @@ void StartBank() {
 	
 
 	int number;
+	vector<Client> clients = LoadClientsFromFile(FILENAME);
 	
 	do {
 		system("cls");
@@ -400,19 +403,19 @@ void StartBank() {
 
 		switch (number) {
 		case 1:
-			ShowAllClients();
+			ShowAllClients(clients);
 			break;
 		case 2:
-			AddClients();
+			AddClients(clients);
 			break;
 		case 3:
-			DeleteClient();
+			DeleteClient(clients);
 			break;
 		case 4:
-			UpdateClient();
+			UpdateClient(clients);
 			break;
 		case 5:
-			FindAndPrintClient();
+			FindAndPrintClient(clients);
 			break;
 		case 6:
 			system("cls");
@@ -421,7 +424,6 @@ void StartBank() {
 
 
 		}
-
 
 	} while (number != 6);
 	
@@ -433,9 +435,6 @@ void StartBank() {
 int main() {
 
 	StartBank();
-
-	
-	
 
 	return 0;
 
