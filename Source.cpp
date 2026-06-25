@@ -144,7 +144,7 @@ void AddClients(vector<Client> &clients) {
 	} while (tolower(answer) == 'y');
 
 	cout << "press any key to go back to main menu screen...";
-	system("pause");
+	system("pause>0");
 
 
 }
@@ -205,8 +205,8 @@ void ShowAllClients(const vector<Client> & clients) {
 	}
 	cout << "---------------------------------------------------------------------------------------\n";
 
-	//cout << "press any key to go back to main menu screen...";
-	system("pause");
+	cout << "press any key to go back to main menu screen...";
+	system("pause>0");
 
 }
 
@@ -249,7 +249,7 @@ void FindAndPrintClient(const vector<Client> &clients) {
 	}
 
 	cout << "press any key to go back to main menu screen...";
-	system("pause");
+	system("pause>0");
 
 }
 
@@ -288,7 +288,7 @@ void DeleteClient(vector<Client>& clients) {
 	}
 
 	cout << "press any key to return to main menu...";
-	system("pause");
+	system("pause>0");
 
 
 }
@@ -324,7 +324,6 @@ void UpdateClient(vector<Client> &clients) {
 			for (Client& c : clients) {
 				if (c.accountNumber == accountNumber) {
 					ChangeClientData(c);
-					cout << "updated successfully \n";
 					SaveUpdatedClientsToFile(clients);
 					break;
 				}
@@ -342,7 +341,7 @@ void UpdateClient(vector<Client> &clients) {
 	}
 
 	cout << "enter anykey to go back to main menu ";
-	system("pause");
+	system("pause>0");
 
 
 }
