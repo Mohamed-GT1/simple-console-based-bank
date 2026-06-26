@@ -25,7 +25,16 @@ enum MenuChoice {
 	eDeleteClient = 3,
 	eUpdateClient = 4,
 	eFindClient = 5,
-	eExit = 6
+	eTransactions =6,
+	eExit = 7
+
+};
+
+enum TransactionMenu {
+	Deposit =1,
+	Withdraw =2,
+	TotalBalance =3,
+	Exit =4
 
 };
 
@@ -332,7 +341,7 @@ void ChangeClientData(Client& client) {
 	cout << "\nenter phone number : ";
 	cin >> client.phoneNumber;
 	cout << "\nenter balance : ";
-	cin >> client.balance;
+	cin >> client.balance; 
 	
 
 }
@@ -410,12 +419,195 @@ void ShowMainMenu() {
 	cout << "\t" << "[3] Delete client.\n";
 	cout << "\t" << "[4] Update client.\n";
 	cout << "\t" << "[5] Find client.\n";
-	cout << "\t" << "[6] Exit.\n";
+	cout << "\t" << "[6] Transactions.\n";
+	cout << "\t" << "[7] Exit.\n";
 	cout << "=======================================\n";
 
 
 
 }
+void ShowTransactionMenu() {
+
+	cout << "=======================================\n";
+	cout << "\tTransaction Menu \n";
+	cout << "=======================================\n";
+	cout << "\t" << "[1] Deposit.\n";
+	cout << "\t" << "[2] Withdraw.\n";
+	cout << "\t" << "[3] Total Balances.\n";
+	cout << "\t" << "[4] Exit.\n";
+	cout << "=======================================\n";
+
+}
+void AddAmountToAccountBalance(vector<Client> & clients,string accountNumber,double amount) {
+
+	for (Client& c : clients) {
+		if (c.accountNumber == accountNumber) {
+			c.balance += amount;
+			SaveUpdatedClientsToFile(clients);
+			cout << "successfully updated , the new balance : " << c.balance << endl;
+			break;
+		}
+	}
+
+}
+
+void DepositAccount(vector<Client> &clients) {
+
+
+	string accountNumber = MyLib::ReadString("enter account number : ");
+	Client client;
+	char answer;
+	double amount;
+	if (FindClientByAccountNumber(clients, accountNumber, client)) {
+		PrintClientCard(client);
+		cout << "enter deposit amount you want : ";
+		cin >> amount;
+		cout << "are you sure you want to deposit : " << amount << " ? [y] [n]\n";
+		cin >> answer;
+		if (tolower(answer) == 'y') {
+			AddAmountToAccountBalance(clients, accountNumber, amount);
+		}
+		else {
+			cout << "balance not updated \n";
+
+		}
+
+
+	}
+	else {
+		cout << "account doesnt exist";
+	}
+
+
+	cout << "press any key to go back . . .";
+	system("pause > nul");       
+
+}
+
+void WithdrawAccount(vector<Client>& clients) {
+	string accountNumber = MyLib::ReadString("enter account number : ");
+	Client client;
+	char answer;
+	double amount;
+	if (FindClientByAccountNumber(clients, accountNumber, client)) {
+		PrintClientCard(client);
+		cout << "enter withdraw amount you want : ";
+		cin >> amount;
+		while (amount > client.balance) {
+			cout << "amount exceeds the balance , you can withdraw up to : " << client.balance << endl;
+			cin >> amount;
+		}
+
+		cout << "are you sure you want to withdraw : " << amount << " ? [y] [n]\n";
+		cin >> answer;
+		if (tolower(answer) == 'y') {
+			AddAmountToAccountBalance(clients, accountNumber, -amount);
+		}
+		else {
+			cout << "balance not updated \n";
+
+		}
+
+
+	}
+	else {
+		cout << "account doesnt exist";
+	}
+
+	cout << "press any key to go back . . .";
+	system("pause > nul");
+
+}
+void ShowTotalBalances(vector<Client> &clients) {
+	cout << "				list of (" << clients.size() << ") clients\n";
+	cout << "-------------------------------------------------------\n";
+	cout << left << setw(15) << "account number" << setw(2) << "|"
+		<< setw(20) << "Name" << setw(2) << "|"
+		<< setw(15) << "balance" << setw(2) << "|";
+	cout << "\n-------------------------------------------------------\n";
+
+	double total = 0;
+
+	for (const Client &client : clients) {
+		cout << left << setw(15) << client.accountNumber << setw(2) << "|"
+			<< setw(20) << client.name << setw(2) << "|"
+			<< setw(15) << client.balance << setw(2) << "|\n";
+		total += client.balance;
+
+
+	}
+	cout << "-------------------------------------------------------\n";
+	cout << "\t\ttotal balance : " << total<<endl;
+
+	cout << "press any key to go back . . .";
+	system("pause > nul");
+
+
+
+}
+
+void GoToTransactionsMenu(vector<Client> &clients) {
+
+	TransactionMenu choice;
+	
+	do {
+		system("cls");
+		ShowTransactionMenu();
+		choice = (TransactionMenu)MyLib::ReadNumberInRange("enter which transaction option you want to perfrom? 1-4", 1, 4);
+		system("cls");
+		switch (choice) {
+		case TransactionMenu::Deposit :
+			DepositAccount(clients);
+			break;
+		case TransactionMenu::Withdraw :
+			WithdrawAccount(clients);
+			break;
+		case TransactionMenu::TotalBalance :
+			ShowTotalBalances(clients);
+			break;
+		case TransactionMenu::Exit:
+			return;
+
+		}
+
+	} while (choice!=TransactionMenu::Exit);
+	
+
+}
+
+void PerformMainMenuOption(MenuChoice menuChoice ,vector<Client> &clients) {
+
+	switch (menuChoice) {
+	case MenuChoice::eShowAllClient:
+		ShowAllClients(clients);
+		break;
+	case MenuChoice::eAddClient:
+		AddClients(clients);
+		break;
+	case MenuChoice::eDeleteClient:
+		DeleteClient(clients);
+		break;
+	case MenuChoice::eUpdateClient:
+		UpdateClient(clients);
+		break;
+	case MenuChoice::eFindClient:
+		FindAndPrintClient(clients);
+		break;
+	case MenuChoice::eTransactions:
+		GoToTransactionsMenu(clients);
+		break;
+	case MenuChoice::eExit:
+		system("cls");
+		cout << "\nprogram ended\n";
+		break;
+
+
+	}
+
+
+
+}
+
 
 void StartBank() {
 	
@@ -428,32 +620,12 @@ void StartBank() {
 		system("cls");
 		ShowMainMenu();
 
-		menuChoice = (MenuChoice)MyLib::ReadNumberInRange("choose what service you want ? 1-6", 1, 6);
+		menuChoice = (MenuChoice)MyLib::ReadNumberInRange("choose what service you want ? 1-7", 1, 7);
 		system("cls");
 
-		switch (menuChoice) {
-		case MenuChoice::eShowAllClient :
-			ShowAllClients(clients);
-			break;
-		case MenuChoice::eAddClient :
-			AddClients(clients);
-			break;
-		case MenuChoice::eDeleteClient :
-			DeleteClient(clients);
-			break;
-		case MenuChoice::eUpdateClient :
-			UpdateClient(clients);
-			break;
-		case MenuChoice::eFindClient :
-			FindAndPrintClient(clients);
-			break;
-		case MenuChoice::eExit :
-			system("cls");
-			cout << "\nprogram ended\n";
-			break;
+		PerformMainMenuOption(menuChoice, clients);
 
-
-		}
+		
 
 	} while (menuChoice != MenuChoice::eExit);
 	
