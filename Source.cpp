@@ -19,8 +19,19 @@ struct Client {
 
 };
 
+enum MenuChoice {
+	eShowAllClient = 1,
+	eAddClient = 2,
+	eDeleteClient = 3,
+	eUpdateClient = 4,
+	eFindClient = 5,
+	eExit = 6
+
+};
+
 void PrintClientCard(Client client);
 void SaveUpdatedClientsToFile(vector<Client> clients);
+vector <Client> LoadClientsFromFile(string fileName);
 
 
 string ConvertClientToRecordString(Client client) {
@@ -37,14 +48,32 @@ string ConvertClientToRecordString(Client client) {
 
 
 }
+bool CheckClientExist(string accountNumber) {
+
+	vector<Client> clients = LoadClientsFromFile(FILENAME);
+	for (const Client& c : clients) {
+		if (c.accountNumber == accountNumber)
+		{
+			cout << "account number already exists for a client \n";
+			return true;
+			
+		}
+	}
+	return false;
+
+}
 
 Client ReadClientData() {
 	Client client;
 	
 	cout << "filling client data.. \n";
+	do {
+		cout << "\nenter Account number : ";
+		getline(cin >> ws, client.accountNumber);
+			
+	} while (CheckClientExist(client.accountNumber));
 
-	cout << "\nenter Account number : ";
-	getline(cin >> ws,client.accountNumber);
+
 
 	cout << "\nenter pincode : ";
 	getline(cin, client.pincode);
@@ -391,32 +420,34 @@ void ShowMainMenu() {
 void StartBank() {
 	
 
-	int number;
+	
+	MenuChoice menuChoice;
 	vector<Client> clients = LoadClientsFromFile(FILENAME);
 	
 	do {
 		system("cls");
 		ShowMainMenu();
-		number = MyLib::ReadNumberInRange("choose what service you want ? 1-6", 1, 6);
+
+		menuChoice = (MenuChoice)MyLib::ReadNumberInRange("choose what service you want ? 1-6", 1, 6);
 		system("cls");
 
-		switch (number) {
-		case 1:
+		switch (menuChoice) {
+		case MenuChoice::eShowAllClient :
 			ShowAllClients(clients);
 			break;
-		case 2:
+		case MenuChoice::eAddClient :
 			AddClients(clients);
 			break;
-		case 3:
+		case MenuChoice::eDeleteClient :
 			DeleteClient(clients);
 			break;
-		case 4:
+		case MenuChoice::eUpdateClient :
 			UpdateClient(clients);
 			break;
-		case 5:
+		case MenuChoice::eFindClient :
 			FindAndPrintClient(clients);
 			break;
-		case 6:
+		case MenuChoice::eExit :
 			system("cls");
 			cout << "\nprogram ended\n";
 			break;
@@ -424,7 +455,7 @@ void StartBank() {
 
 		}
 
-	} while (number != 6);
+	} while (menuChoice != MenuChoice::eExit);
 	
 
 
